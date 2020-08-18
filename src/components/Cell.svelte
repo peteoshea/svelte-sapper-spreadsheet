@@ -42,7 +42,10 @@
   };
   const doubleClicked = () => {
     console.log('Double click registered');
+    clearTimeout(timer);
     doubleClickOccurred = true;
+    emitUnselectAllEvent();
+    selected = true;
   };
 
   /**
