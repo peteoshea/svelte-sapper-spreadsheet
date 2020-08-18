@@ -1,4 +1,6 @@
 <script>
+  import { onMount } from 'svelte';
+
   export let row;
   export let column;
   let selected = false;
@@ -6,10 +8,40 @@
   const alpha = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
   /**
+   * Used by `componentDid(Un)Mount`, handles the `unselectAll`
+   * event response
+   */
+  const handleUnselectAll = () => {
+    if (selected) {
+      selected = false;
+    }
+  };
+
+  // Lifecycle events
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      window.document.addEventListener('unselectAll', handleUnselectAll);
+    }
+  });
+
+  /**
    * Handle clicking a Cell.
    */
   const clicked = () => {
+    emitUnselectAllEvent();
     selected = true;
+  };
+
+  /**
+   * Emits the `unselectAll` event, used to tell all the other
+   * cells to unselect
+   */
+  const emitUnselectAllEvent = () => {
+    const unselectAllEvent = new Event('unselectAll');
+
+    if (typeof window !== 'undefined') {
+      window.document.dispatchEvent(unselectAllEvent);
+    }
   };
 </script>
 
@@ -55,8 +87,6 @@
   {#if row === 0}
     <span class="cell first-row">{alpha[column]}</span>
   {:else}
-    <span class="cell {selected ? 'selected' : ''}" on:click={clicked}>
-      Cell {alpha[column]}{row}
-    </span>
+    <span class="cell {selected ? 'selected' : ''}" on:click={clicked} />
   {/if}
 {/if}
