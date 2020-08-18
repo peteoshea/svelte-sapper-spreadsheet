@@ -3,7 +3,10 @@
 
   export let row;
   export let column;
+  let delay = 300;
+  let doubleClickOccurred = false;
   let selected = false;
+  let timer = 0;
 
   const alpha = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -28,8 +31,18 @@
    * Handle clicking a Cell.
    */
   const clicked = () => {
-    emitUnselectAllEvent();
-    selected = true;
+    timer = setTimeout(() => {
+      if (!doubleClickOccurred) {
+        console.log('Click registered');
+        emitUnselectAllEvent();
+        selected = true;
+      }
+      doubleClickOccurred = false;
+    }, delay);
+  };
+  const doubleClicked = () => {
+    console.log('Double click registered');
+    doubleClickOccurred = true;
   };
 
   /**
@@ -87,6 +100,9 @@
   {#if row === 0}
     <span class="cell first-row">{alpha[column]}</span>
   {:else}
-    <span class="cell {selected ? 'selected' : ''}" on:click={clicked} />
+    <span
+      class="cell {selected ? 'selected' : ''}"
+      on:click={clicked}
+      on:dblclick={doubleClicked} />
   {/if}
 {/if}
