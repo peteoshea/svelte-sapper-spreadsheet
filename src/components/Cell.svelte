@@ -1,8 +1,16 @@
 <script>
   export let row;
   export let column;
+  let selected = false;
 
   const alpha = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+  /**
+   * Handle clicking a Cell.
+   */
+  const clicked = () => {
+    selected = true;
+  };
 </script>
 
 <style>
@@ -30,6 +38,11 @@
     background-color: #f0f0f0;
     font-weight: bold;
   }
+
+  span.cell.selected {
+    outline-color: blue;
+    outline-style: solid;
+  }
 </style>
 
 {#if column === 0}
@@ -42,6 +55,8 @@
   {#if row === 0}
     <span class="cell first-row">{alpha[column]}</span>
   {:else}
-    <span class="cell">Cell {alpha[column]}{row}</span>
+    <span class="cell {selected ? 'selected' : ''}" on:click={clicked}>
+      Cell {alpha[column]}{row}
+    </span>
   {/if}
 {/if}
