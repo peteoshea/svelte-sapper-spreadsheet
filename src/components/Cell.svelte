@@ -5,6 +5,7 @@
   export let column;
   let delay = 300;
   let doubleClickOccurred = false;
+  let editing = false;
   let selected = false;
   let timer = 0;
 
@@ -33,7 +34,6 @@
   const clicked = () => {
     timer = setTimeout(() => {
       if (!doubleClickOccurred) {
-        console.log('Click registered');
         emitUnselectAllEvent();
         selected = true;
       }
@@ -41,11 +41,11 @@
     }, delay);
   };
   const doubleClicked = () => {
-    console.log('Double click registered');
     clearTimeout(timer);
     doubleClickOccurred = true;
     emitUnselectAllEvent();
     selected = true;
+    editing = true;
   };
 
   /**
@@ -62,7 +62,7 @@
 </script>
 
 <style>
-  span.cell {
+  .cell {
     width: 80px;
     padding: 4px;
     margin: 0;
@@ -102,6 +102,9 @@
 {:else}
   {#if row === 0}
     <span class="cell first-row">{alpha[column]}</span>
+  {:else if editing}
+    <!-- svelte-ignore a11y-autofocus -->
+    <input class="cell" type="text" autoFocus />
   {:else}
     <span
       class="cell {selected ? 'selected' : ''}"
