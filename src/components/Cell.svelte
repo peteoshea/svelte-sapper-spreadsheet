@@ -3,6 +3,9 @@
 
   export let row;
   export let column;
+  export let onChangedValue;
+  export let value;
+
   let delay = 300;
   let doubleClickOccurred = false;
   let editing = false;
@@ -29,7 +32,7 @@
   });
 
   /**
-   * Handle clicking a Cell.
+   * Handle Cell editing.
    */
   const clicked = () => {
     timer = setTimeout(() => {
@@ -46,6 +49,37 @@
     emitUnselectAllEvent();
     selected = true;
     editing = true;
+  };
+  const onChange = (event) => {
+    if (typeof event.value !== 'undefined') {
+      value = event.value.target;
+    }
+  };
+
+  /**
+   * Called by the `onBlur` or `onKeyPress` event handlers,
+   * it escalates the value changed event, and restores the editing
+   * state to `false`.
+   */
+  const hasNewValue = (value) => {
+    onChangedValue(column, row, value);
+    editing = false;
+  };
+
+  /**
+   * Handle moving away from a cell, stores the new value
+   */
+  const onBlur = (event) => {
+    hasNewValue(event.target.value);
+  };
+
+  /**
+   * Handle pressing a key when the Cell is an input element
+   */
+  const onKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      hasNewValue(event.target.value);
+    }
   };
 
   /**
@@ -104,11 +138,17 @@
     <span class="cell first-row">{alpha[column]}</span>
   {:else if editing}
     <!-- svelte-ignore a11y-autofocus -->
-    <input class="cell" type="text" autoFocus />
+    <input
+      class="cell"
+      type="text"
+      on:blur={onBlur}
+      on:change={onChange}
+      on:keypress={onKeyPress}
+      {value}
+      autoFocus />
   {:else}
-    <span
-      class="cell {selected ? 'selected' : ''}"
-      on:click={clicked}
-      on:dblclick={doubleClicked} />
+    <span class="cell {selected ? 'selected' : ''}" on:click={clicked} on:dblclick={doubleClicked}>
+      {value}
+    </span>
   {/if}
 {/if}
